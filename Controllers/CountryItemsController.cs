@@ -29,7 +29,7 @@ namespace CountriesCapitalAPI.Controllers
             var populationCounts = await _context.PopulationCounts.ToListAsync();
             foreach (var countryItem in countryItems)
             {
-                countryItem.PopulationCounts.AddRange(populationCounts.FindAll(x => x.CountryItemId == countryItem.Id));
+                countryItem.PopulationCounts = populationCounts.FindAll(x => x.CountryItemId == countryItem.Id);
             }
             return countryItems;
         }
@@ -45,7 +45,7 @@ namespace CountriesCapitalAPI.Controllers
                 return NotFound();
             }
 
-            countryItem.PopulationCounts.AddRange(populationCounts.FindAll(x => x.CountryItemId == countryItem.Id));
+            countryItem.PopulationCounts = populationCounts.FindAll(x => x.CountryItemId == countryItem.Id);
 
             return countryItem;
         }
