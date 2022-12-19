@@ -23,9 +23,9 @@ namespace CountriesCapitalAPI.Controllers
 
         // GET: api/CountryItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CountryItem>>> GetcountryItems()
+        public async Task<ActionResult<IEnumerable<CountryItem>>> GetcountryItems([FromQuery] PaginationParams @params)
         {
-            var countryItems = await _context.countryItems.ToListAsync();
+            var countryItems = await _context.countryItems.Skip((@params.Page - 1) * 50).Take(50).ToListAsync();
             var populationCounts = await _context.PopulationCounts.ToListAsync();
             foreach (var countryItem in countryItems)
             {
