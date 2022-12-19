@@ -25,30 +25,30 @@ namespace CountriesCapitalAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PopulationCount",
+                name: "PopulationCounts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    year = table.Column<int>(type: "int", nullable: false),
-                    value = table.Column<int>(type: "int", nullable: false),
-                    sex = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    reliabilty = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    Value = table.Column<int>(type: "int", nullable: false),
+                    Sex = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Reliabilty = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CountryItemId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PopulationCount", x => x.Id);
+                    table.PrimaryKey("PK_PopulationCounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PopulationCount_countryItems_CountryItemId",
+                        name: "FK_PopulationCounts_countryItems_CountryItemId",
                         column: x => x.CountryItemId,
                         principalTable: "countryItems",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PopulationCount_CountryItemId",
-                table: "PopulationCount",
+                name: "IX_PopulationCounts_CountryItemId",
+                table: "PopulationCounts",
                 column: "CountryItemId");
         }
 
@@ -56,7 +56,7 @@ namespace CountriesCapitalAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "PopulationCount");
+                name: "PopulationCounts");
 
             migrationBuilder.DropTable(
                 name: "countryItems");

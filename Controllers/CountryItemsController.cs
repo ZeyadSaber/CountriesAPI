@@ -25,7 +25,13 @@ namespace CountriesCapitalAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryItem>>> GetcountryItems()
         {
-            return await _context.countryItems.ToListAsync();
+            var countryItems = await _context.countryItems.ToListAsync();
+            var populationCounts = await _context.PopulationCounts.ToListAsync();
+            foreach (var countryItem in countryItems)
+            {
+                countryItem.PopulationCounts.AddRange(populationCounts.FindAll(x => x.CountryItemId == countryItem.Id));
+            }
+            return countryItems;
         }
 
         // GET: api/CountryItems/5
@@ -33,11 +39,13 @@ namespace CountriesCapitalAPI.Controllers
         public async Task<ActionResult<CountryItem>> GetCountryItem(int id)
         {
             var countryItem = await _context.countryItems.FindAsync(id);
-
+            var populationCounts = await _context.PopulationCounts.ToListAsync();
             if (countryItem == null)
             {
                 return NotFound();
             }
+
+            countryItem.PopulationCounts.AddRange(populationCounts.FindAll(x => x.CountryItemId == countryItem.Id));
 
             return countryItem;
         }
@@ -62,7 +70,7 @@ namespace CountriesCapitalAPI.Controllers
             {
                 if (!CountryItemExists(id))
                 {
-                    return NotFound();
+                    await PostCountryItem(new List<CountryItem>(){ countryItem });
                 }
                 else
                 {
@@ -76,28 +84,15 @@ namespace CountriesCapitalAPI.Controllers
         // POST: api/CountryItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CountryItem>> PostCountryItem(CountryItem countryItem)
+        public async Task<ActionResult<CountryItem>> PostCountryItem(IEnumerable<CountryItem> countryItems)
         {
-            _context.countryItems.Add(countryItem);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCountryItem", new { id = countryItem.Id }, countryItem);
-        }
-
-        // DELETE: api/CountryItems/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCountryItem(int id)
-        {
-            var countryItem = await _context.countryItems.FindAsync(id);
-            if (countryItem == null)
+            foreach(var countryItem in countryItems)
             {
-                return NotFound();
+                _context.countryItems.Add(countryItem);
+                await _context.SaveChangesAsync();
             }
 
-            _context.countryItems.Remove(countryItem);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok();
         }
 
         private bool CountryItemExists(int id)

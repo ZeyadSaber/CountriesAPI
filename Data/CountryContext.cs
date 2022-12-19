@@ -10,5 +10,6 @@ namespace CountriesCapitalAPI.Data
         }
 
         public DbSet<CountryItem> countryItems { get; set; }
+        public DbSet<PopulationCount> PopulationCounts { get; set; }
     }
 }

@@ -54,25 +54,25 @@ namespace CountriesCapitalAPI.Migrations
                     b.Property<int?>("CountryItemId")
                         .HasColumnType("int");
 
-                    b.Property<string>("reliabilty")
+                    b.Property<string>("Reliabilty")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("sex")
+                    b.Property<string>("Sex")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("value")
+                    b.Property<int>("Value")
                         .HasColumnType("int");
 
-                    b.Property<int>("year")
+                    b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CountryItemId");
 
-                    b.ToTable("PopulationCount");
+                    b.ToTable("PopulationCounts");
                 });
 
             modelBuilder.Entity("CountriesCapitalAPI.Models.PopulationCount", b =>
