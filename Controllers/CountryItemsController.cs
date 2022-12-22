@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CountriesCapitalAPI.Data;
 using CountriesCapitalAPI.Models;
+using NuGet.Protocol;
 
 namespace CountriesCapitalAPI.Controllers
 {
@@ -25,29 +26,43 @@ namespace CountriesCapitalAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryItem>>> GetcountryItems([FromQuery] PaginationParams @params)
         {
-            var countryItems = await _context.countryItems.Skip((@params.Page - 1) * 50).Take(50).ToListAsync();
-            var populationCounts = await _context.PopulationCounts.ToListAsync();
-            foreach (var countryItem in countryItems)
-            {
-                countryItem.PopulationCounts = populationCounts.FindAll(x => x.CountryItemId == countryItem.Id);
-            }
+            var countryItems = await (from c in _context.countryItems.Skip((@params.Page - 1) * 50).Take(50)
+                                      select new CountryItem
+                                      {
+                                          Id = c.Id,
+                                          City = c.City,
+                                          Country = c.Country,
+                                          PopulationCounts = (from p in _context.PopulationCounts
+                                                              where p.CountryItemId == c.Id
+                                                              select p).ToList()
+                                      }
+                                      ).ToListAsync();
+
             return countryItems;
         }
 
         // GET: api/CountryItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CountryItem>> GetCountryItem(int id)
+        public ActionResult<CountryItem> GetCountryItem(int id)
         {
-            var countryItem = await _context.countryItems.FindAsync(id);
-            var populationCounts = await _context.PopulationCounts.ToListAsync();
+            var countryItem =  (from c in _context.countryItems
+                                   where c.Id == id
+                                   select new CountryItem
+                                   {
+                                       Id = id,
+                                       City = c.City,
+                                       Country = c.Country,
+                                       PopulationCounts = (from p in _context.PopulationCounts
+                                                           where p.CountryItemId == id
+                                                           select p).ToList()
+                                   });
             if (countryItem == null)
             {
                 return NotFound();
             }
 
-            countryItem.PopulationCounts = populationCounts.FindAll(x => x.CountryItemId == countryItem.Id);
 
-            return countryItem;
+            return (CountryItem)countryItem;
         }
 
         // PUT: api/CountryItems/5
@@ -84,7 +99,7 @@ namespace CountriesCapitalAPI.Controllers
         // POST: api/CountryItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CountryItem>> PostCountryItem(IEnumerable<CountryItem> countryItems)
+        public async Task<ActionResult<IEnumerable<CountryItem>>> PostCountryItem(IEnumerable<CountryItem> countryItems)
         {
             foreach(var countryItem in countryItems)
             {
@@ -92,7 +107,7 @@ namespace CountriesCapitalAPI.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Ok();
+            return Ok(countryItems);
         }
 
         private bool CountryItemExists(int id)
